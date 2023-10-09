@@ -1,5 +1,5 @@
 ---
-title: "UNM06"
+title: "UNM07"
 output:
   pdf_document: default
 date: "2023-09-14"
@@ -128,7 +128,7 @@ ggplot(MA_training) +
   geom_point(mapping = aes(x = block, y = mean_accuracy, color = condition)) +
   geom_line(mapping = aes(x = block, y = mean_accuracy, color = condition)) +
   geom_errorbar(aes(x= block, y = mean_accuracy, ymin = mean_accuracy-sd_accuracy, ymax = mean_accuracy+sd_accuracy), color = "black", width=.1,position=position_dodge(0.05)) +
-  labs(title = "Mean accuracy for the 4 blocks of the training phase")
+  labs(title = "Mean accuracy for the 8 blocks of the training phase")
 ```
 
 
@@ -174,7 +174,7 @@ bay_ANOVA_resp_int <- bay_ANOVA_resp[4]/bay_ANOVA_resp[3]
 print(bay_ANOVA_resp_int)
 ```
 
-Subjects in the certain group showed higher accuracy through training than the uncertain group, reaching an asymptote of 0.85 around block 4. However, the uncertain group showed a slower increase in their accuracy that reached 0.7 in block 8. A mixed methods ANOVA confirmed a significant effect of the Block (`r apa(ANOVA_resp, effect = "block")`, `r report_BF_and_error(bay_ANOVA_resp[1])`) and  the main efect of the Condition (`r apa(ANOVA_resp, effect = "condition" )`, `r report_BF_and_error(bay_ANOVA_resp[2])`), but the interaction between them was non significant (`r apa(ANOVA_resp, effect = "block:condition")`, `r report_BF_and_error(bay_ANOVA_resp_int[1])`). 
+Subjects in the certain group showed higher accuracy through training than the uncertain group, reaching an asymptote of 0.85 around block 4. However, the uncertain group showed a slower increase in their accuracy that reached 0.7 in block 8. A mixed methods ANOVA confirmed a significant effect of the Block (`r apa(ANOVA_resp, effect = "block")`, `r report_BF_and_error(bay_ANOVA_resp[1])`) and  the main effect of the Condition (`r apa(ANOVA_resp, effect = "condition" )`, `r report_BF_and_error(bay_ANOVA_resp[2])`), but the interaction between them was non significant (`r apa(ANOVA_resp, effect = "block:condition")`, `r report_BF_and_error(bay_ANOVA_resp_int[1])`). Extreme evidence in favor of the alternative hypothesis was found for both main effects, but the evidence was moderate for the null hypothesis in the case of the interaction. 
 
 ```{r, include = FALSE}
 ##Main effect of Condition
@@ -220,7 +220,7 @@ print(bay_ANOVA_acc_test)
 bay_ANOVA_acc_test_int <- bay_ANOVA_acc_test[4]/bay_ANOVA_acc_test[3]
 print(bay_ANOVA_acc_test_int)
 ```
-There are no differences in accuracy due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis in all cases, except for the interaction, where we observe anecdotal evidence for the alternative hypothesis (respectively, `r apa(ANOVA_acc_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_acc_test[1])`; `r apa(ANOVA_acc_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test[2])`; `r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`).
+There are no differences in accuracy due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates moderate evidence for the null hypothesis in all cases, except for the interaction, where we observe anecdotal evidence for the alternative hypothesis (respectively, `r apa(ANOVA_acc_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_acc_test[1])`; `r apa(ANOVA_acc_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test[2])`; `r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`).
 
 ### Memory score
 ```{r, include = FALSE}
@@ -253,7 +253,7 @@ print(bay_ANOVA_mem_test)
 bay_ANOVA_mem_test_int <- bay_ANOVA_mem_test[4]/bay_ANOVA_mem_test[3]
 print(bay_ANOVA_mem_test_int)
 ```
-There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis in all cases, except for the interaction, where we observe anecdotal evidence for the alternative hypothesis (respectively, `r apa(ANOVA_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_mem_test[1])`; `r apa(ANOVA_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test[2])`; `r apa(ANOVA_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test_int[1])`).
+There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates moderate evidence for the null hypothesis in all cases, except for the interaction, where we observe anecdotal evidence for the alternative hypothesis (respectively, `r apa(ANOVA_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_mem_test[1])`; `r apa(ANOVA_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test[2])`; `r apa(ANOVA_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test_int[1])`).
 
 ### Corrected memory score (with errors out)
 ```{r, include = FALSE}
@@ -287,7 +287,7 @@ print(bay_ANOVA_cms_test)
 bay_ANOVA_cms_test_int <- bay_ANOVA_cms_test[4]/bay_ANOVA_cms_test[3]
 print(bay_ANOVA_cms_test_int)
 ```
-There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis in all cases (respectively, `r apa(ANOVA_cms_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_cms_test[1])`; `r apa(ANOVA_cms_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test[2])`; `r apa(ANOVA_cms_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test_int[1])`).
+There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis for the effect of certainty and the interaction, and moderate null for predictiveness (respectively, `r apa(ANOVA_cms_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_cms_test[1])`; `r apa(ANOVA_cms_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test[2])`; `r apa(ANOVA_cms_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test_int[1])`).
 
 ### Other corrected memory score
 ```{r, include = FALSE}
@@ -320,7 +320,7 @@ print(bay_ANOVA_c_mem_test)
 bay_ANOVA_c_mem_test_int <- bay_ANOVA_c_mem_test[4]/bay_ANOVA_c_mem_test[3]
 print(bay_ANOVA_c_mem_test_int)
 ```
-There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis in all cases, except for the interaction, where we observe anecdotal evidence for the alternative hypothesis (respectively, `r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; `r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`; `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`).
+There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis for certainty, moderate null for predictiveness, and anecdotal evidence for the alternative hypothesis for the interaction (respectively, `r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; `r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`; `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`).
 
 ## Certain only results
 ```{r, include = FALSE}
@@ -388,15 +388,15 @@ d <- with(cms_cert_test,
 shapiro.test(d)
 ```
 ```{r, include=FALSE}
-t.test_cms_cert_test <- t.test(mem ~ predictiveness, data = cms_cert_test, paired = TRUE)
-print(t.test_cms_cert_test)
+wilcox_cms_cert_test <- wilcox.test(mem ~ predictiveness, data = cms_cert_test, paired = TRUE)
+print(wilcox_cms_cert_test)
 
 pred_cms_cert_test <- subset(cms_cert_test,  predictiveness == "predictive", mem, drop = TRUE)
 nonpred_cms_cert_test <- subset(cms_cert_test,  predictiveness == "non-predictive", mem, drop = TRUE)
 bay_t.test_cms_cert_test <-  ttestBF(pred_cms_cert_test, nonpred_cms_cert_test, paired = TRUE)
 print(bay_t.test_cms_cert_test)
 ```
-There are no significant differences in memory due to predictiveness  and the bayesian analysis indicates anecdotal evidence for the null hypothesis (`r apa(t.test_cms_cert_test)`, `r report_BF_and_error(bay_t.test_cms_cert_test[1])`).
+There are no significant differences in memory due to predictiveness  and the bayesian analysis indicates anecdotal evidence for the null hypothesis (`r apa(wilcox_cms_cert_test)`, `r report_BF_and_error(bay_t.test_cms_cert_test[1])`).
 
 ### Other corrected memory score
 ```{r, include=FALSE}
