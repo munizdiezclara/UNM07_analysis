@@ -396,7 +396,7 @@ nonpred_cms_cert_test <- subset(cms_cert_test,  predictiveness == "non-predictiv
 bay_t.test_cms_cert_test <-  ttestBF(pred_cms_cert_test, nonpred_cms_cert_test, paired = TRUE)
 print(bay_t.test_cms_cert_test)
 ```
-There are no significant differences in memory due to predictiveness  and the bayesian analysis indicates anecdotal evidence for the null hypothesis (`r apa(wilcox_cms_cert_test)`, `r report_BF_and_error(bay_t.test_cms_cert_test[1])`).
+There are no significant differences in memory due to predictiveness  and the bayesian analysis indicates anecdotal evidence for the null hypothesis (*V* = `r  wilcox_cms_cert_test[["statistic"]]`, *p* = `r wilcox_cms_cert_test[["p.value"]]`, `r report_BF_and_error(bay_t.test_cms_cert_test[1])`).
 
 ### Other corrected memory score
 ```{r, include=FALSE}
