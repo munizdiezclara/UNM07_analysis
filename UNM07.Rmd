@@ -369,7 +369,7 @@ nonpred_acc_cert_test <- subset(acc_cert_test,  predictiveness == "non-predictiv
 bay_t.test_acc_cert_test <-  ttestBF(pred_acc_cert_test, nonpred_acc_cert_test, paired = TRUE)
 print(bay_t.test_acc_cert_test)
 ```
-There are no differences in accuracy due to predictiveness, and the bayesian analysis indicates anecdotal evidence for the null hypothesis (`r apa(t.test_acc_cert_test)`, `r report_BF_and_error(bay_t.test_acc_cert_test[1])`).
+There is a significant difference in accuracy due to predictiveness, but bayesian analysis indicates anecdotal evidence for the alternative hypothesis (`r apa(t.test_acc_cert_test)`, `r report_BF_and_error(bay_t.test_acc_cert_test[1])`).
 
 ### Memory score
 
@@ -394,7 +394,7 @@ bay_t.test_mem_cert_test <-  ttestBF(pred_mem_cert_test, nonpred_mem_cert_test, 
 print(bay_t.test_mem_cert_test)
 ```
 
-There are no significant differences in memory due to predictiveness and the bayesian analysis indicates anecdotal evidence for the null hypothesis (`r apa(t.test_mem_cert_test)`, `r report_BF_and_error(bay_t.test_mem_cert_test[1])`).
+There is a significant difference in accuracy due to predictiveness, but bayesian analysis indicates anecdotal evidence for the alternative hypothesis (`r apa(t.test_mem_cert_test)`, `r report_BF_and_error(bay_t.test_mem_cert_test[1])`).
 
 ### Corrected memory score (with errors out)
 ```{r, include = FALSE}
@@ -439,5 +439,5 @@ nonpred_c_mem_cert_test <- subset(c_mem_cert_test,  predictiveness == "non-predi
 bay_t.test_c_mem_cert_test <-  ttestBF(pred_c_mem_cert_test, nonpred_c_mem_cert_test, paired = TRUE)
 print(bay_t.test_c_mem_cert_test)
 ```
-There are no significant differences in memory due to predictiveness  and the bayesian analysis indicates anecdotal evidence for the null hypothesis (`r apa(t.test_c_mem_cert_test)`, `r report_BF_and_error(bay_t.test_c_mem_cert_test[1])`).
+There is a significant difference in accuracy due to predictiveness, but bayesian analysis indicates anecdotal evidence for the alternative hypothesis (`r apa(t.test_c_mem_cert_test)`, `r report_BF_and_error(bay_t.test_c_mem_cert_test[1])`).
 
