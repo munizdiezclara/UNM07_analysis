@@ -293,101 +293,13 @@ pairs(c_mem_test_interaction, adjust = "bon")
 
 There are no significant differences in memory due to the condition or the predictiveness, and the bayesian analysis indicates anecdotal evidence for the null hypothesis for certainty and predictiveness (respectively, `r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; `r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`). However, the interaction was found significant and the bayesian evidence moderate (`r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(58) = -1.397, *p* = 0.006) but there were no differences in the uncertain condition (*T*(58) = 0.429, *p* = 0.44).
 
-## Differences between 
+## Differences in uncertain between high and low accuracy
 ```{r, include = FALSE}
-cert_test <- filter(test, condition == "Certain")
+high <- filter(resp, condition == "Uncertain" & block == 8 & mean_response >= 0.6)
+high_responders <- high$pNum
+low <- filter(resp, condition == "Uncertain" & block == 8 & mean_response < 0.6)
+low_responders <- low$pNum
+test <- test %>%
+  mutate(responder = case_when(pNum %in% high ~ "high",
+                               pNum %in% low ~ "low"))
 ```
-
-### Accuracy
-```{r, include=FALSE}
-#t test accuracy
-acc_cert_test <- cert_test %>%
-  group_by (pNum, predictiveness) %>%
-  summarise(acc = mean(acc, na.rm = TRUE))
-# compute the difference
-d <- with(acc_cert_test, 
-        acc[predictiveness == "non-predictive"] - acc[predictiveness == "predictive"])
-# Shapiro-Wilk normality test for the differences
-shapiro.test(d)
-```
-```{r, include=FALSE}
-t.test_acc_cert_test <- t.test(acc ~ predictiveness, data = acc_cert_test, paired = TRUE)
-print(t.test_acc_cert_test)
-
-pred_acc_cert_test <- subset(acc_cert_test,  predictiveness == "predictive", acc, drop = TRUE)
-nonpred_acc_cert_test <- subset(acc_cert_test,  predictiveness == "non-predictive", acc, drop = TRUE)
-bay_t.test_acc_cert_test <-  ttestBF(pred_acc_cert_test, nonpred_acc_cert_test, paired = TRUE)
-print(bay_t.test_acc_cert_test)
-```
-There is a significant difference in accuracy due to predictiveness, but bayesian analysis indicates anecdotal evidence for the alternative hypothesis (`r apa(t.test_acc_cert_test)`, `r report_BF_and_error(bay_t.test_acc_cert_test[1])`).
-
-### Memory score
-
-```{r, include=FALSE}
-#ANOVA
-mem_cert_test <- cert_test %>%
-  group_by (pNum, predictiveness) %>%
-  summarise(mem = mean(mem_score, na.rm = TRUE))
-# compute the difference
-d <- with(mem_cert_test, 
-        mem[predictiveness == "non-predictive"] - mem[predictiveness == "predictive"])
-# Shapiro-Wilk normality test for the differences
-shapiro.test(d)
-```
-```{r, include=FALSE}
-t.test_mem_cert_test <- t.test(mem ~ predictiveness, data = mem_cert_test, paired = TRUE)
-print(t.test_mem_cert_test)
-
-pred_mem_cert_test <- subset(mem_cert_test,  predictiveness == "predictive", mem, drop = TRUE)
-nonpred_mem_cert_test <- subset(mem_cert_test,  predictiveness == "non-predictive", mem, drop = TRUE)
-bay_t.test_mem_cert_test <-  ttestBF(pred_mem_cert_test, nonpred_mem_cert_test, paired = TRUE)
-print(bay_t.test_mem_cert_test)
-```
-
-There is a significant difference in accuracy due to predictiveness, but bayesian analysis indicates anecdotal evidence for the alternative hypothesis (`r apa(t.test_mem_cert_test)`, `r report_BF_and_error(bay_t.test_mem_cert_test[1])`).
-
-### Corrected memory score (with errors out)
-```{r, include = FALSE}
-c_cert_test <- filter(cert_test, acc == 1)
-cms_cert_test <- c_cert_test %>%
-  group_by (pNum, predictiveness) %>%
-  summarise(mem = mean(mem_score, na.rm = TRUE))
-# compute the difference
-d <- with(cms_cert_test, 
-        mem[predictiveness == "non-predictive"] - mem[predictiveness == "predictive"])
-# Shapiro-Wilk normality test for the differences
-shapiro.test(d)
-```
-```{r, include=FALSE}
-wilcox_cms_cert_test <- wilcox.test(mem ~ predictiveness, data = cms_cert_test, paired = TRUE)
-print(wilcox_cms_cert_test)
-
-pred_cms_cert_test <- subset(cms_cert_test,  predictiveness == "predictive", mem, drop = TRUE)
-nonpred_cms_cert_test <- subset(cms_cert_test,  predictiveness == "non-predictive", mem, drop = TRUE)
-bay_t.test_cms_cert_test <-  ttestBF(pred_cms_cert_test, nonpred_cms_cert_test, paired = TRUE)
-print(bay_t.test_cms_cert_test)
-```
-There are no significant differences in memory due to predictiveness  and the bayesian analysis indicates anecdotal evidence for the null hypothesis (*V* = `r  wilcox_cms_cert_test[["statistic"]]`, *p* = `r wilcox_cms_cert_test[["p.value"]]`, `r report_BF_and_error(bay_t.test_cms_cert_test[1])`).
-
-### Other corrected memory score
-```{r, include=FALSE}
-c_mem_cert_test <- cert_test %>%
-  group_by (pNum, predictiveness) %>%
-  summarise(c_mem = mean(c_mem_score, na.rm = TRUE))
-# compute the difference
-d <- with(c_mem_cert_test, 
-        c_mem[predictiveness == "non-predictive"] - c_mem[predictiveness == "predictive"])
-# Shapiro-Wilk normality test for the differences
-shapiro.test(d)
-```
-```{r, include=FALSE}
-t.test_c_mem_cert_test <- t.test(c_mem ~ predictiveness, data = c_mem_cert_test, paired = TRUE)
-print(t.test_c_mem_cert_test)
-
-pred_c_mem_cert_test <- subset(c_mem_cert_test,  predictiveness == "predictive", c_mem, drop = TRUE)
-nonpred_c_mem_cert_test <- subset(c_mem_cert_test,  predictiveness == "non-predictive", c_mem, drop = TRUE)
-bay_t.test_c_mem_cert_test <-  ttestBF(pred_c_mem_cert_test, nonpred_c_mem_cert_test, paired = TRUE)
-print(bay_t.test_c_mem_cert_test)
-```
-There is a significant difference in accuracy due to predictiveness, but bayesian analysis indicates anecdotal evidence for the alternative hypothesis (`r apa(t.test_c_mem_cert_test)`, `r report_BF_and_error(bay_t.test_c_mem_cert_test[1])`).
-
