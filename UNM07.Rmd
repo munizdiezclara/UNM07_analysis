@@ -270,41 +270,7 @@ pairs(mem_test_interaction, adjust = "bon")
 ```
 There were no significant differences in memory due to the condition, with the bayesian anova indicating moderate evidence for the null hypothesis (`r apa(ANOVA_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_mem_test[1])`). However, there is a significant effect of both the predictiveness and the interaction, the former showing anecdotal evidence and the latter, moderate evidence (`r apa(ANOVA_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test[2])`; `r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -1.882, *p* < 0.001) but there were no differences in the uncertain condition (*T*(96) = 0.075, *p* = 0.892).
 
-### Corrected memory score (with errors out)
-```{r, include = FALSE}
-c_test <- filter(test, acc == 1)
-MCMS_test <- c_test %>%
-  group_by(cue_type, condition) %>%
-  summarise(mean_mem = mean(mem_score, na.rm = TRUE),
-            sd_mem = sd(mem_score, na.rm = TRUE)/sqrt(length(mem_score)))
-```
-```{r, echo = FALSE}
-ggplot(MCMS_test) +
-  geom_col(mapping = aes(x = cue_type, y = mean_mem, fill = condition)) +
-  geom_errorbar(aes(x= cue_type, y = mean_mem, ymin = mean_mem-sd_mem, ymax = mean_mem+sd_mem), color = "black", width=.1,position=position_dodge(0.05)) +
-  labs(title = "Mean corrected memory score in the test phase")
-```
-```{r, include=FALSE}
-#ANOVA
-cms_test <- c_test %>%
-  group_by (pNum, condition, predictiveness) %>%
-  summarise(mean_mem = mean(mem_score, na.rm = TRUE))
-cms_test$pNum <- factor(cms_test$pNum)
-cms_test$condition <- factor(cms_test$condition)
-cms_test$predictiveness <- factor(cms_test$predictiveness)
-ANOVA_cms_test <- aov_car(formula = mean_mem ~ condition + Error(pNum/predictiveness), data = cms_test)
-print(ANOVA_cms_test)
-
-bay_ANOVA_cms_test <- anovaBF(formula = mean_mem ~ condition + predictiveness + pNum,
-        data = data.frame(cms_test),
-        whichRandom = "pNum")
-print(bay_ANOVA_cms_test)
-bay_ANOVA_cms_test_int <- bay_ANOVA_cms_test[4]/bay_ANOVA_cms_test[3]
-print(bay_ANOVA_cms_test_int)
-```
-There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis for the effect of certainty and the interaction, and moderate null for predictiveness (respectively, `r apa(ANOVA_cms_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_cms_test[1])`; `r apa(ANOVA_cms_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test[2])`; `r apa(ANOVA_cms_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test_int[1])`).
-
-### Other corrected memory score
+### Corrected memory score (hits x1, errors x0)
 ```{r, include = FALSE}
 Mc_mem_test <- test %>%
   group_by(cue_type, condition) %>%
@@ -343,6 +309,40 @@ pairs(c_mem_test_interaction, adjust = "bon")
 ```
 
 There were no significant differences in memory due to the condition, and the bayesian analysis indicated moderate evidence for the null hypothesis (`r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; ). However, both the effect of predictiveness and the interaction was found significant, being the bayesian evidence anecdotal in the case of predictiveness and moderate in favor of the alternative hypothesis for the interaction (`r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`; `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -1.175, *p* < 0.001) but there were no differences in the uncertain condition (*T*(96) = 0.149, *p* = 0.653).
+
+### Corrected memory score (with errors out)
+```{r, include = FALSE}
+c_test <- filter(test, acc == 1)
+MCMS_test <- c_test %>%
+  group_by(cue_type, condition) %>%
+  summarise(mean_mem = mean(mem_score, na.rm = TRUE),
+            sd_mem = sd(mem_score, na.rm = TRUE)/sqrt(length(mem_score)))
+```
+```{r, echo = FALSE}
+ggplot(MCMS_test) +
+  geom_col(mapping = aes(x = cue_type, y = mean_mem, fill = condition)) +
+  geom_errorbar(aes(x= cue_type, y = mean_mem, ymin = mean_mem-sd_mem, ymax = mean_mem+sd_mem), color = "black", width=.1,position=position_dodge(0.05)) +
+  labs(title = "Mean corrected memory score in the test phase")
+```
+```{r, include=FALSE}
+#ANOVA
+cms_test <- c_test %>%
+  group_by (pNum, condition, predictiveness) %>%
+  summarise(mean_mem = mean(mem_score, na.rm = TRUE))
+cms_test$pNum <- factor(cms_test$pNum)
+cms_test$condition <- factor(cms_test$condition)
+cms_test$predictiveness <- factor(cms_test$predictiveness)
+ANOVA_cms_test <- aov_car(formula = mean_mem ~ condition + Error(pNum/predictiveness), data = cms_test)
+print(ANOVA_cms_test)
+
+bay_ANOVA_cms_test <- anovaBF(formula = mean_mem ~ condition + predictiveness + pNum,
+        data = data.frame(cms_test),
+        whichRandom = "pNum")
+print(bay_ANOVA_cms_test)
+bay_ANOVA_cms_test_int <- bay_ANOVA_cms_test[4]/bay_ANOVA_cms_test[3]
+print(bay_ANOVA_cms_test_int)
+```
+There are no significant differences in memory due to the condition, the predictiveness or the interaction of them, and the bayesian analysis indicates anecdotal evidence for the null hypothesis for the effect of certainty and the interaction, and moderate null for predictiveness (respectively, `r apa(ANOVA_cms_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_cms_test[1])`; `r apa(ANOVA_cms_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test[2])`; `r apa(ANOVA_cms_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_cms_test_int[1])`).
 
 ## Certain only results
 ```{r, include = FALSE}
@@ -394,7 +394,29 @@ bay_t.test_mem_cert_test <-  ttestBF(pred_mem_cert_test, nonpred_mem_cert_test, 
 print(bay_t.test_mem_cert_test)
 ```
 
-There is a significant difference in accuracy due to predictiveness, and bayesian analysis indicates moderate evidence for the alternative hypothesis (`r apa(t.test_mem_cert_test)`, `r report_BF_and_error(bay_t.test_mem_cert_test[1])`).
+There is a significant difference in memory score due to predictiveness, and bayesian analysis indicates moderate evidence for the alternative hypothesis (`r apa(t.test_mem_cert_test)`, `r report_BF_and_error(bay_t.test_mem_cert_test[1])`).
+
+### Corrected memory score (hits x1, errors x0)
+```{r, include=FALSE}
+c_mem_cert_test <- cert_test %>%
+  group_by (pNum, predictiveness) %>%
+  summarise(c_mem = mean(c_mem_score, na.rm = TRUE))
+# compute the difference
+d <- with(c_mem_cert_test, 
+        c_mem[predictiveness == "non-predictive"] - c_mem[predictiveness == "predictive"])
+# Shapiro-Wilk normality test for the differences
+shapiro.test(d)
+```
+```{r, include=FALSE}
+t.test_c_mem_cert_test <- t.test(c_mem ~ predictiveness, data = c_mem_cert_test, paired = TRUE)
+print(t.test_c_mem_cert_test)
+
+pred_c_mem_cert_test <- subset(c_mem_cert_test,  predictiveness == "predictive", c_mem, drop = TRUE)
+nonpred_c_mem_cert_test <- subset(c_mem_cert_test,  predictiveness == "non-predictive", c_mem, drop = TRUE)
+bay_t.test_c_mem_cert_test <-  ttestBF(pred_c_mem_cert_test, nonpred_c_mem_cert_test, paired = TRUE)
+print(bay_t.test_c_mem_cert_test)
+```
+There is a significant difference in the memory score due to predictiveness, and bayesian analysis indicates strong evidence for the alternative hypothesis (`r apa(t.test_c_mem_cert_test)`, `r report_BF_and_error(bay_t.test_c_mem_cert_test[1])`).
 
 ### Corrected memory score (with errors out)
 ```{r, include = FALSE}
@@ -419,24 +441,3 @@ print(bay_t.test_cms_cert_test)
 ```
 There are no significant differences in memory due to predictiveness, and the bayesian analysis indicates anecdotal evidence for the null hypothesis (*V* = `r  wilcox_cms_cert_test[["statistic"]]`, *p* = `r wilcox_cms_cert_test[["p.value"]]`, `r report_BF_and_error(bay_t.test_cms_cert_test[1])`).
 
-### Other corrected memory score
-```{r, include=FALSE}
-c_mem_cert_test <- cert_test %>%
-  group_by (pNum, predictiveness) %>%
-  summarise(c_mem = mean(c_mem_score, na.rm = TRUE))
-# compute the difference
-d <- with(c_mem_cert_test, 
-        c_mem[predictiveness == "non-predictive"] - c_mem[predictiveness == "predictive"])
-# Shapiro-Wilk normality test for the differences
-shapiro.test(d)
-```
-```{r, include=FALSE}
-t.test_c_mem_cert_test <- t.test(c_mem ~ predictiveness, data = c_mem_cert_test, paired = TRUE)
-print(t.test_c_mem_cert_test)
-
-pred_c_mem_cert_test <- subset(c_mem_cert_test,  predictiveness == "predictive", c_mem, drop = TRUE)
-nonpred_c_mem_cert_test <- subset(c_mem_cert_test,  predictiveness == "non-predictive", c_mem, drop = TRUE)
-bay_t.test_c_mem_cert_test <-  ttestBF(pred_c_mem_cert_test, nonpred_c_mem_cert_test, paired = TRUE)
-print(bay_t.test_c_mem_cert_test)
-```
-There is a significant difference in accuracy due to predictiveness, and bayesian analysis indicates strong evidence for the alternative hypothesis (`r apa(t.test_c_mem_cert_test)`, `r report_BF_and_error(bay_t.test_c_mem_cert_test[1])`).
