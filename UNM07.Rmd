@@ -227,6 +227,8 @@ print(bay_ANOVA_acc_test_int)
 #interaction analysis
 acc_test_interaction <- emmeans(ANOVA_acc_test, ~ predictiveness|condition)
 pairs(acc_test_interaction, adjust = "bon")
+acc_test_interaction2 <- emmeans(ANOVA_acc_test, ~ condition|predictiveness)
+pairs(acc_test_interaction2, adjust = "bon")
 ```
 
 There are no differences in accuracy due to the condition nor the predictiveness, and the bayesian analysis indicates moderate evidence for the null hypothesis for condition and anecdotal for predictiveness (respectively, `r apa(ANOVA_acc_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_acc_test[1])`; `r apa(ANOVA_acc_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test[2])`). However, the interaction was significant and the bayesian evidence, moderate for the alternative hypothesis (`r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -0.123, *p* = 0.002) but there were no differences in the uncertain condition (*T*(96) = 0.02, *p* = 0.589).
@@ -267,6 +269,8 @@ print(bay_ANOVA_mem_test_int)
 #interaction analysis
 mem_test_interaction <- emmeans(ANOVA_mem_test, ~ predictiveness|condition)
 pairs(mem_test_interaction, adjust = "bon")
+mem_test_interaction2 <- emmeans(ANOVA_mem_test, ~ condition|predictiveness)
+pairs(mem_test_interaction2, adjust = "bon")
 ```
 There were no significant differences in memory due to the condition, with the bayesian anova indicating moderate evidence for the null hypothesis (`r apa(ANOVA_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_mem_test[1])`). However, there is a significant effect of both the predictiveness and the interaction, the former showing anecdotal evidence and the latter, moderate evidence (`r apa(ANOVA_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test[2])`; `r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -1.882, *p* < 0.001) but there were no differences in the uncertain condition (*T*(96) = 0.075, *p* = 0.892).
 
@@ -306,6 +310,8 @@ print(bay_ANOVA_c_mem_test_int)
 #interaction analysis
 c_mem_test_interaction <- emmeans(ANOVA_c_mem_test, ~ predictiveness|condition)
 pairs(c_mem_test_interaction, adjust = "bon")
+c_mem_test_interaction2 <- emmeans(ANOVA_c_mem_test, ~ condition|predictiveness)
+pairs(c_mem_test_interaction2, adjust = "bon")
 ```
 
 There were no significant differences in memory due to the condition, and the bayesian analysis indicated moderate evidence for the null hypothesis (`r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; ). However, both the effect of predictiveness and the interaction was found significant, being the bayesian evidence anecdotal in the case of predictiveness and moderate in favor of the alternative hypothesis for the interaction (`r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`; `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -1.175, *p* < 0.001) but there were no differences in the uncertain condition (*T*(96) = 0.149, *p* = 0.653).
@@ -441,3 +447,5 @@ print(bay_t.test_cms_cert_test)
 ```
 There are no significant differences in memory due to predictiveness, and the bayesian analysis indicates anecdotal evidence for the null hypothesis (*V* = `r  wilcox_cms_cert_test[["statistic"]]`, *p* = `r wilcox_cms_cert_test[["p.value"]]`, `r report_BF_and_error(bay_t.test_cms_cert_test[1])`).
 
+#  Further steps
+Memory on the change to uncertainty of easdale paper.
