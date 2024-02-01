@@ -1,0 +1,228 @@
+---
+title: "UNM07"
+output:
+  pdf_document: default
+date: "2023-09-14"
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(afex)
+library(BayesFactor)
+library(apa)
+library(emmeans)
+library("writexl")
+load("C:/Users/munizdie/OneDrive - Lancaster University/Experiments/Recognition Memory/UNM07/UNM07_analysis/UNM07_proc_data.RData")
+# function to force scientific formatting of numbers (used for large BFs)
+changeSciNot <- function(n) {
+  output <- format(n, scientific = TRUE, digits = 2) #Transforms the number into scientific notation even if small
+  output <- sub("e", "x10^", output) #Replace e with 10^
+  output <- sub("\\+0?", "", output) #Remove + symbol and leading zeros on exponent, if > 1
+  output <- sub("-0?", "-", output) #Leaves - symbol but removes leading zeros on exponent, if < 1
+  output <- paste0(output,"^")
+  # output = strsplit(output, "^", fixed = TRUE)
+  # output = paste0(output[[1]][1],"^", output[[1]][2], "^")
+  output
+}
+
+# function to extract and report BFs with error %s
+report_BF_and_error <- function(BF_in, sci_not = TRUE, hyp = "alt"){
+  
+  if (hyp == "alt") {
+    BF_notation = "BF~10~ = "
+  } else if (hyp == "null") {
+    BF_notation = "BF~01~ = "
+  }
+  
+  if (sci_not == TRUE) {
+    BF_value = changeSciNot(extractBF(BF_in)$bf) # change to sci notation
+  } else {
+    BF_value = round(extractBF(BF_in)$bf,2) # otherwise round
+  }
+  
+  paste0(BF_notation, 
+         BF_value, 
+         " &plusmn; ", 
+         round(100*extractBF(BF_in)$error,2), 
+         "%")
+}
+
+```
+
+# Design
+
+In this experiment, the differences in recognition memory of predictive and non-predictive cues was examined under both a certain and an uncertain training. Both groups received a training in which two cues are presented in each trial followed by an outcome. Only one of the cues is predictive of the outcome, whereas the other appears the same amount of times with each of the two possible outcomes. In one of this groups, the contingency between the predictive cues and their respective outcomes is of 1, so in each trial that the predictive cue is presented its corresponding outcome follows. For the other group, this contingency is of 0.8, so the predictive cue is followed by the outcome on 80% of the trials. After the training phase, all subjects were presented two cues on each trial, one that was presented on training and one that wasn't, but that was similar to the other cues presented on the training phase (a pair of balls swapped colours in the fouls). Subjects had to choose which one they had seen before and rate how confident they were of their choice.
+
++------------+---------------------------+------------+
+| Group      | Training                  | Test2      |
++============+:=========================:+:==========:+
+| Certain    | AX - O1                   | A vs *b*   |
+|            |                           |            |
+|            |                           | A vs *x*   |
+|            |                           |            |
+|            |                           | A vs *y*   |
++------------+---------------------------+------------+
+|            | AY - O1                   | B vs *a*   |
+|            |                           |            |
+|            |                           | B vs *x*   |
+|            |                           |            |
+|            |                           | B vs *y*   |
++------------+---------------------------+------------+
+|            | BX - 02                   | X vs *a*   |
+|            |                           |            |
+|            |                           | X vs *b*   |
+|            |                           |            |
+|            |                           | X vs *y*   |
++------------+---------------------------+------------+
+|            | BY - O2                   | Y vs *a*   |
+|            |                           |            |
+|            |                           | Y vs *b*   |
+|            |                           |            |
+|            |                           | Y vs *x*   |
++------------+---------------------------+------------+
+| Uncertain  | 0.8 AX - O1 / 0.2 AX - O2 | A vs *b*   |
+|            |                           |            |
+|            |                           | A vs *x*   |
+|            |                           |            |
+|            |                           | A vs *y*   |
++------------+---------------------------+------------+
+|            | 0.8 AY - O1 / 0.2 AY - O2 | B vs *a*   |
+|            |                           |            |
+|            |                           | B vs *x*   |
+|            |                           |            |
+|            |                           | B vs *y*   |
++------------+---------------------------+------------+
+|            | 0.8 BX - O1 / 0.2 BX - O2 | X vs *a*   |
+|            |                           |            |
+|            |                           | X vs *b*   |
+|            |                           |            |
+|            |                           | X vs *y*   |
++------------+---------------------------+------------+
+|            | 0.8 BY - O1 / 0.2 BY - O2 | Y vs *a*   |
+|            |                           |            |
+|            |                           | Y vs *b*   |
+|            |                           |            |
+|            |                           | Y vs *x*   |
++------------+---------------------------+------------+
+
+# Results
+## Test
+```{r, include = FALSE}
+test <- test %>%
+  mutate(trial_type = case_when((target == 1 & distractor == 2) | (target == 2 & distractor == 1) ~ "Pt vs Pf",
+                                (target == 5 & distractor == 6) | (target == 6 & distractor == 5) ~ "NPt vs NPf",
+                                (target == 1 & (distractor == 5 | distractor == 6)) | (target == 2 & (distractor == 5 | distractor == 6)) ~ "Pt vs NPf",
+                                (target == 5 & (distractor == 1 | distractor == 2)) | (target == 6 & (distractor == 1 | distractor == 2)) ~ "NPt vs Pf",
+                                (target == 3 & distractor == 4) | (target == 4 & distractor == 3) ~ "Pt vs Pf",
+                                (target == 7 & distractor == 8) | (target == 8 & distractor == 7) ~ "NPt vs NPf",
+                                (target == 3 & (distractor == 7 | distractor == 8)) | (target == 4 & (distractor == 7 | distractor == 8)) ~ "Pt vs NPf",
+                                (target == 7 & (distractor == 3 | distractor == 4)) | (target == 8 & (distractor == 3 | distractor == 4)) ~ "NPt vs Pf"),
+         predictiveness = case_when(trial_type == "Pt vs Pf" ~ "predictive",
+                                    trial_type == "NPt vs NPf"  ~ "non-predictive",
+                                    trial_type == "Pt vs NPf" ~ "predictive",
+                                    trial_type == "NPt vs Pf" ~ "non-predictive"),
+         congruence = case_when(trial_type == "Pt vs Pf" ~ "congruent",
+                                    trial_type == "NPt vs NPf"  ~ "congruent",
+                                    trial_type == "Pt vs NPf" ~ "incongruent",
+                                    trial_type == "NPt vs Pf" ~ "incongruent"))
+```
+
+### Accuracy
+```{r, include = FALSE}
+MA_test <- test %>%
+  group_by(trial_type, condition) %>%
+  summarise(mean_acc = mean(acc, na.rm = TRUE),
+            sd_acc = sd(acc, na.rm = TRUE)/sqrt(length(acc)))
+```
+```{r, echo = FALSE}
+ggplot(MA_test)+ 
+  geom_col(mapping = aes(x = condition, y = mean_acc, fill = trial_type), position = position_dodge2()) + 
+  geom_errorbar(aes(x= condition, y = mean_acc, ymin = mean_acc-sd_acc, ymax = mean_acc+sd_acc, group = trial_type), color = "black", width=.2, position = position_dodge(0.9)) + 
+  labs(title = "Mean accuracy in the test phase")+ 
+  scale_fill_brewer(palette="PRGn")
+```
+```{r, include=FALSE}
+#ANOVA
+acc_test <- test %>%
+  group_by (pNum, condition, predictiveness, congruence) %>%
+  summarise(mean_acc = mean(acc, na.rm = TRUE))
+acc_test$pNum <- factor(acc_test$pNum)
+acc_test$condition <- factor(acc_test$condition)
+acc_test$predictiveness <- factor(acc_test$predictiveness)
+acc_test$congruence <- factor(acc_test$congruence)
+ANOVA_acc_test <- aov_car(formula = mean_acc ~ condition + Error(pNum/predictiveness*congruence), data = acc_test)
+print(ANOVA_acc_test)
+
+bay_ANOVA_acc_test <- anovaBF(formula = mean_acc ~ condition + predictiveness + congruence + pNum,
+        data = data.frame(acc_test),
+        whichRandom = "pNum")
+print(bay_ANOVA_acc_test)
+bay_ANOVA_acc_test_condxp <- bay_ANOVA_acc_test[4]/bay_ANOVA_acc_test[3]
+print(bay_ANOVA_acc_test_condxp)
+bay_ANOVA_acc_test_pxcong <- bay_ANOVA_acc_test[13]/bay_ANOVA_acc_test[7]
+print(bay_ANOVA_acc_test_pxcong)
+bay_ANOVA_acc_test_condxcong <- bay_ANOVA_acc_test[10]/bay_ANOVA_acc_test[6]
+print(bay_ANOVA_acc_test_condxcong)
+bay_ANOVA_acc_test_condxpxcong <- bay_ANOVA_acc_test[18]/bay_ANOVA_acc_test[17]
+print(bay_ANOVA_acc_test_condxpxcong)
+```
+```{r, include = FALSE}
+# Pairwise comparisons between group levels
+#interaction analysis
+acc_test_condxp_int <- emmeans(ANOVA_acc_test, ~ predictiveness|condition)
+pairs(acc_test_condxp_int, adjust = "bon")
+acc_test_condxp_int2 <- emmeans(ANOVA_acc_test, ~ condition|predictiveness)
+pairs(acc_test_condxp_int2, adjust = "bon")
+```
+
+A mixed methods ANOVA found a significant the main effect of the Predictiveness (`r apa(ANOVA_acc_test, effect = "predictiveness"`, `r report_BF_and_error(bay_ANOVA_acc_test[2])`), showing anecdotal bayesian evidence for the alternative hypothesis, and the effect of the ConditionxPredictiveness interaction (`r apa(ANOVA_acc_test, effect = "condition:predictiveness"`, `r report_BF_and_error(bay_ANOVA_acc_test_condxp[1])`), with moderate evidence for the alternative. Bonferroni corrected pairwise comparisons showed significant differences due to predictiveness in the certain condition (*T*(96) = 3.382, *p* = .001), but not in the Uncertain condition (*T*(96) = 0.156, *p* = .877). There rest of effects were not significant(Condition: `r apa(ANOVA_acc_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_acc_test[1])`; Congruence: `r apa(ANOVA_acc_test, effect = "congruence")`, `r report_BF_and_error(bay_ANOVA_acc_test[5])`, PredictivenessxCongruence: `r apa(ANOVA_acc_test, effect = "predictiveness:congruence")`, `r report_BF_and_error(bay_ANOVA_acc_test_pxcong[1])`; ConditionxCongruence: `r apa(ANOVA_acc_test, effect = "condition:predictiveness:congruence")`, `r report_BF_and_error(bay_ANOVA_acc_test_condxpxcong[1])`; ConditionxPredictivenessxCongruence: `r apa(ANOVA_acc_test, effect = "predictiveness:congruence")`, `r report_BF_and_error(bay_ANOVA_acc_test_pxcong[1])`). All these effects showed moderate bayesian evidence for the null hypothesis, except for the 3 way interaction, that showed anecdotal evidence for the alternative hypothesis.
+
+### Corrected memory score (hits x1, errors x0)
+```{r, include = FALSE}
+Mc_mem_test <- test %>%
+  group_by(trial_type, condition) %>%
+  summarise(mean_c_mem = mean(c_mem_score, na.rm = TRUE),
+            sd_c_mem = sd(c_mem_score, na.rm = TRUE)/sqrt(length(c_mem_score)))
+```
+```{r, echo = FALSE}
+ggplot(Mc_mem_test) +
+  geom_col(mapping = aes(x = condition, y = mean_c_mem, fill = trial_type), position = position_dodge2()) +
+  geom_errorbar(aes(x= condition, y = mean_c_mem, ymin = mean_c_mem-sd_c_mem, ymax = mean_c_mem+sd_c_mem, group = trial_type), color = "black", width=.2,position=position_dodge(0.9)) +
+  labs(title = "Mean corrected memory score in the test phase") +
+  scale_fill_brewer(palette = "PRGn")
+```
+```{r, include=FALSE}
+#ANOVA
+c_mem_test <- test %>%
+  group_by (pNum, condition, predictiveness, congruence) %>%
+  summarise(mean_c_mem = mean(c_mem_score, na.rm = TRUE))
+c_mem_test$pNum <- factor(c_mem_test$pNum)
+c_mem_test$condition <- factor(c_mem_test$condition)
+c_mem_test$predictiveness <- factor(c_mem_test$predictiveness)
+c_mem_test$congruence <- factor(c_mem_test$congruence)
+ANOVA_c_mem_test <- aov_car(formula = mean_c_mem ~ condition + Error(pNum/predictiveness*congruence), data = c_mem_test)
+print(ANOVA_c_mem_test)
+
+bay_ANOVA_c_mem_test <- anovaBF(formula = mean_c_mem ~ condition + predictiveness + congruence + pNum,
+        data = data.frame(c_mem_test),
+        whichRandom = "pNum")
+print(bay_ANOVA_c_mem_test)
+bay_ANOVA_c_mem_test_condxp <- bay_ANOVA_c_mem_test[4]/bay_ANOVA_c_mem_test[3]
+print(bay_ANOVA_c_mem_test_condxp)
+bay_ANOVA_c_mem_test_pxcong <- bay_ANOVA_c_mem_test[13]/bay_ANOVA_c_mem_test[7]
+print(bay_ANOVA_c_mem_test_pxcong)
+bay_ANOVA_c_mem_test_condxcong <- bay_ANOVA_c_mem_test[10]/bay_ANOVA_c_mem_test[6]
+print(bay_ANOVA_c_mem_test_condxcong)
+bay_ANOVA_c_mem_test_condxpxcong <- bay_ANOVA_c_mem_test[18]/bay_ANOVA_c_mem_test[17]
+print(bay_ANOVA_c_mem_test_condxpxcong)
+```
+```{r, include = FALSE}
+# Pairwise comparisons between group levels
+#interaction analysis
+c_mem_test_interaction <- emmeans(ANOVA_c_mem_test, ~ predictiveness|condition)
+pairs(c_mem_test_interaction, adjust = "bon")
+#c_mem_test_interaction2 <- emmeans(ANOVA_c_mem_test, ~ condition|predictiveness)
+#pairs(c_mem_test_interaction2, adjust = "bon")
+```
+
+A mixed methods ANOVA found a significant the main effect of the Predictiveness (`r apa(ANOVA_c_mem_test, effect = "predictiveness"`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`), showing moderate bayesian evidence for the alternative hypothesis, and the effect of the ConditionxPredictiveness interaction (`r apa(ANOVA_c_mem_test, effect = "condition:predictiveness"`, `r report_BF_and_error(bay_ANOVA_c_mem_test_condxp[1])`), this supported by strong bayesian evidence. BonferrThe rest of effects were not significant (Condition: `r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; Congruence: `r apa(ANOVA_c_mem_test, effect = "congruence")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[5])`, PredictivenessxCongruence: `r apa(ANOVA_c_mem_test, effect = "predictiveness:congruence")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_pxcong[1])`; ConditionxCongruence: `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness:congruence")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_condxpxcong[1])`; ConditionxPredictivenessxCongruence: `r apa(ANOVA_c_mem_test, effect = "predictiveness:congruence")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_pxcong[1])`). All these effects showed moderate bayesian evidence for the null hypothesis, except for the 3 way interaction, for which the evidence was anecdotal. 
