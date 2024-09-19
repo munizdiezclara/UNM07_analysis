@@ -110,10 +110,10 @@ In this experiment, the differences in recognition memory of predictive and non-
 ```{r, include=FALSE}
 #Create probable response variable, as we are using the uncertain condition
 training <- training %>%
-  mutate(prob_response = case_when((cue1 == 1 | cue1 == 3) & cue_o_mouse.clicked_name == "o1_image" ~ 1,
-                                   (cue1 == 1 | cue1 == 3) & cue_o_mouse.clicked_name == "o2_image" ~ 0, 
-                                   (cue1 == 2 | cue1 == 4) & cue_o_mouse.clicked_name == "o1_image" ~ 0,
-                                   (cue1 == 2 | cue1 == 4) & cue_o_mouse.clicked_name == "o2_image" ~ 1))
+  mutate(prob_response = case_when((cue1 == 1 | cue1 == 3) & response == "o1_image" ~ 1,
+                                   (cue1 == 1 | cue1 == 3) & response == "o2_image" ~ 0, 
+                                   (cue1 == 2 | cue1 == 4) & response == "o1_image" ~ 0,
+                                   (cue1 == 2 | cue1 == 4) & response == "o2_image" ~ 1))
 ```
 ```{r, include=FALSE}
 #Plot Training accuracy

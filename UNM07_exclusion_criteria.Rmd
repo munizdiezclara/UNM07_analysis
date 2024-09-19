@@ -10,7 +10,7 @@ library(tidyverse)
 library(afex)
 library(BayesFactor)
 library(apa)
-#library(emmeans)
+library(emmeans)
 library("writexl")
 load("C:/Users/munizdie/OneDrive - Lancaster University/Experiments/Recognition Memory/UNM07/UNM07_analysis/UNM07_proc_data.RData")
 # function to force scientific formatting of numbers (used for large BFs)
@@ -110,10 +110,10 @@ In this experiment, the differences in recognition memory of predictive and non-
 ```{r, include=FALSE}
 #Create probable response variable, as we are using the uncertain condition
 training <- training %>%
-  mutate(prob_response = case_when((cue1 == 1 | cue1 == 3) & cue_o_mouse.clicked_name == "o1_image" ~ 1,
-                                   (cue1 == 1 | cue1 == 3) & cue_o_mouse.clicked_name == "o2_image" ~ 0, 
-                                   (cue1 == 2 | cue1 == 4) & cue_o_mouse.clicked_name == "o1_image" ~ 0,
-                                   (cue1 == 2 | cue1 == 4) & cue_o_mouse.clicked_name == "o2_image" ~ 1))
+  mutate(prob_response = case_when((cue1 == 1 | cue1 == 3) & response == "o1_image" ~ 1,
+                                   (cue1 == 1 | cue1 == 3) & response == "o2_image" ~ 0, 
+                                   (cue1 == 2 | cue1 == 4) & response == "o1_image" ~ 0,
+                                   (cue1 == 2 | cue1 == 4) & response == "o2_image" ~ 1))
 block8 <- filter(training, block == 8) %>%
   group_by(pNum, condition) %>%
   summarise (mean_response = mean(prob_response, na.rm = TRUE))
@@ -183,19 +183,11 @@ bay_ANOVA_resp_int <- bay_ANOVA_resp[4]/bay_ANOVA_resp[3]
 print(bay_ANOVA_resp_int)
 ```
 
-Subjects in the certain group showed higher accuracy through training than the uncertain group, reaching an accuracy of aounr 0.,92 on block 8. However, the uncertain group showed a slower increase in their accuracy that reached 0.77 in block 8. A mixed methods ANOVA confirmed a significant effect of the Block (`r apa(ANOVA_resp, effect = "block")`, `r report_BF_and_error(bay_ANOVA_resp[1])`) and  the main effect of the Condition (`r apa(ANOVA_resp, effect = "condition" )`, `r report_BF_and_error(bay_ANOVA_resp[2])`), but the interaction between them was non significant (`r apa(ANOVA_resp, effect = "condition:block")`, `r report_BF_and_error(bay_ANOVA_resp_int[1])`). Extreme evidence in favor of the alternative hypothesis was found for both main effects, and evidence was moderate for the null hypothesis in the case of the interaction. 
+Subjects in the certain group showed higher accuracy through training than the uncertain group, reaching an accuracy of aounr 0.,92 on block 8. However, the uncertain group showed a slower increase in their accuracy that reached 0.77 in block 8. A mixed methods ANOVA confirmed a significant effect of the Block (`r apa(ANOVA_resp, effect = "block")`, `r report_BF_and_error(bay_ANOVA_resp[1])`) and the main effect of the Condition (`r apa(ANOVA_resp, effect = "condition" )`, `r report_BF_and_error(bay_ANOVA_resp[2])`), but the interaction between them was non significant (`r apa(ANOVA_resp, effect = "condition:block")`, `r report_BF_and_error(bay_ANOVA_resp_int[1])`). Extreme evidence in favor of the alternative hypothesis was found for both main effects, and evidence was very strong for the null hypothesis in the case of the interaction. 
 
 ```{r, include = FALSE}
-##Main effect of Condition
-resp_fitted_condition <- emmeans(ANOVA_resp, ~ condition)
-print(resp_fitted_condition)
-
-
 ##Main effect of block
-resp_fitted_block <- emmeans(ANOVA_resp, ~ block)
-print(resp_fitted_block)
-#pairwise comparison with bonferroni correction
-pairs(resp_fitted_block, adjust = "bon")
+pairwise.t.test(resp$mean_response, resp$block, p.adjust.method= "bonferroni")
 ```
 
 ## Test
@@ -240,7 +232,7 @@ acc_test_interaction2 <- emmeans(ANOVA_acc_test, ~ condition|predictiveness)
 pairs(acc_test_interaction2, adjust = "bon")
 ```
 
-There are no differences in accuracy due to the condition nor the predictiveness, and the bayesian analysis indicates moderate evidence for the null hypothesis for condition and anecdotal for predictiveness (respectively, `r apa(ANOVA_acc_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_acc_test[1])`; `r apa(ANOVA_acc_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test[2])`). However, the interaction was significant and the bayesian evidence, moderate for the alternative hypothesis (`r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -0.123, *p* = 0.002) but there were no differences in the uncertain condition (*T*(96) = 0.02, *p* = 0.589).
+There are no differences in accuracy due to the condition the bayesian analysis indicated moderate evidence for the null hypothesis for condition (`r apa(ANOVA_acc_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_acc_test[1])`).However, the effect of predictiveness was significant, with anecdotal alternative bayesian evidence (`r apa(ANOVA_acc_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test[2])`) as well as the interaction, with the bayesian evidence being moderate for the alternative hypothesis (`r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(75) = 3.14, *p* = 0.002) but there were no differences in the uncertain condition (*T*(75) = 0.159, *p* = 0.874).
 
 ### Memory score
 ```{r, include = FALSE}
@@ -281,7 +273,7 @@ pairs(mem_test_interaction, adjust = "bon")
 mem_test_interaction2 <- emmeans(ANOVA_mem_test, ~ condition|predictiveness)
 pairs(mem_test_interaction2, adjust = "bon")
 ```
-There were no significant differences in memory due to the condition, with the bayesian anova indicating moderate evidence for the null hypothesis (`r apa(ANOVA_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_mem_test[1])`). However, there is a significant effect of both the predictiveness and the interaction, the former showing anecdotal evidence and the latter, moderate evidence (`r apa(ANOVA_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test[2])`; `r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -1.882, *p* < 0.001) but there were no differences in the uncertain condition (*T*(96) = 0.075, *p* = 0.892).
+There were no significant differences in memory due to the condition, with the bayesian anova indicating moderate evidence for the null hypothesis (`r apa(ANOVA_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_mem_test[1])`). However, there is a significant effect of both the predictiveness and the interaction, the former showing moderate evidence and the latter, anecdotal evidence (`r apa(ANOVA_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_mem_test[2])`; `r apa(ANOVA_acc_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_acc_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(75) = 3.532, *p* < 0.001) but there were no differences in the uncertain condition (*T*(75) = 0.359, *p* = 0.721).
 
 ### Corrected memory score (hits x1, errors x0)
 ```{r, include = FALSE}
@@ -323,7 +315,7 @@ c_mem_test_interaction2 <- emmeans(ANOVA_c_mem_test, ~ condition|predictiveness)
 pairs(c_mem_test_interaction2, adjust = "bon")
 ```
 
-There were no significant differences in memory due to the condition, and the bayesian analysis indicated moderate evidence for the null hypothesis (`r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; ). However, both the effect of predictiveness and the interaction was found significant, being the bayesian evidence anecdotal in the case of predictiveness and moderate in favor of the alternative hypothesis for the interaction (`r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`; `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -1.175, *p* < 0.001) but there were no differences in the uncertain condition (*T*(96) = 0.149, *p* = 0.653).
+There were no significant differences in memory due to the condition, and the bayesian analysis indicated moderate evidence for the null hypothesis (`r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; ). However, both the effect of predictiveness and the interaction was found significant, being the bayesian evidence moderate in the case of predictiveness and anecdotal in favor of the alternative hypothesis for the interaction (`r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`; `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(75) = 3.633, *p* < 0.001) but there were no differences in the uncertain condition (*T*(75) = 0.276, *p* = 0.783).
 
 ### Corrected memory score (with errors out)
 ```{r, include = FALSE}
