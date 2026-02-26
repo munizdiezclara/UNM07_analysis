@@ -11,6 +11,8 @@ library(afex)
 library(BayesFactor)
 library(apa)
 library(emmeans)
+library(papaja)
+library(rstatix)
 library("writexl")
 load("C:/Users/munizdie/OneDrive - Lancaster University/Experiments/Recognition Memory/UNM07/UNM07_analysis/UNM07_proc_data.RData")
 # function to force scientific formatting of numbers (used for large BFs)
@@ -306,13 +308,22 @@ bay_ANOVA_c_mem_test_int <- bay_ANOVA_c_mem_test[4]/bay_ANOVA_c_mem_test[3]
 print(bay_ANOVA_c_mem_test_int)
 ```
 ```{r, include = FALSE}
-# Pairwise comparisons between group levels
-#interaction analysis
-c_mem_test_interaction <- emmeans(ANOVA_c_mem_test, ~ predictiveness|condition)
-pairs(c_mem_test_interaction, adjust = "bon")
-c_mem_test_interaction2 <- emmeans(ANOVA_c_mem_test, ~ condition|predictiveness)
-pairs(c_mem_test_interaction2, adjust = "bon")
+#calculate the simple main effect of predictiveness
+sme_mem_UNM07_test_pred <- c_mem_test %>%
+  group_by(condition) %>%
+  anova_test(mean_c_mem ~ predictiveness + Error(pNum/predictiveness), effect.size = "pes") %>%
+  get_anova_table() %>%
+  adjust_pvalue(method = "bonferroni")
+sme_mem_UNM07_test_pred #Call the output table
+#calculate the simple main effect of predictiveness
+sme_mem_UNM07_test_cond<- c_mem_test %>%
+  group_by(predictiveness) %>%
+  anova_test(mean_c_mem ~ condition, effect.size = "pes") %>%
+  get_anova_table() %>%
+  adjust_pvalue(method = "bonferroni")
+sme_mem_UNM07_test_cond #Call the output table
 ```
+
 
 There were no significant differences in memory due to the condition, and the bayesian analysis indicated moderate evidence for the null hypothesis (`r apa(ANOVA_c_mem_test, effect = "condition")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[1])`; ). However, both the effect of predictiveness and the interaction was found significant, being the bayesian evidence anecdotal in the case of predictiveness and moderate in favor of the alternative hypothesis for the interaction (`r apa(ANOVA_c_mem_test, effect = "predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test[2])`; `r apa(ANOVA_c_mem_test, effect = "condition:predictiveness")`, `r report_BF_and_error(bay_ANOVA_c_mem_test_int[1])`). Bonferroni corrected pairwise comparisons indicated that there the accuracy was higher for the predictive cues in the certain condition (*T*(96) = -1.175, *p* < 0.001) but there were no differences in the uncertain condition (*T*(96) = 0.149, *p* = 0.653).
 
